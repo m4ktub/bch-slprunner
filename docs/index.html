@@ -1,1 +1,73 @@
-<!DOCTYPE html><html><head><title>Lode Runner Web Game - SLP Version</title><meta http-equiv=Content-Type content=text/html charset=utf-8><meta http-equiv=X-UA-Compatible content="chrome=1, IE=edge"><link href=lodeRunner.ico rel="shortcut icon"><style>#canvas { position:absolute; left:0; top:0; }</style><script src=lodeRunner.wData.js></script><script src=./lib/preloadjs-0.6.2.min.js></script><script src=./lib/soundjs-0.6.2.min.js></script><script src=./lib/tweenjs-0.6.2.min.js></script><script src=./lib/easeljs-0.7.1.min.js></script><script src=flag32Id.js></script><script src=lodeRunner.gameVerName.js></script><script src=lodeRunner.v.classic.js></script><script src=lodeRunner.v.professional.js></script><script src=lodeRunner.v.revenge.js></script><script src=lodeRunner.v.fanBookMod.js></script><script src=lodeRunner.v.championship.js></script><script src=lodeRunner.storage.js></script><script src=lodeRunner.def.js></script><script src=lodeRunner.key.js></script><script src=lodeRunner.misc.js></script><script src=lodeRunner.hiscore.js></script><script src=lodeRunner.info.js></script><script src=lodeRunner.menu.js></script><script src=lodeRunner.iconClass.js></script><script src=lodeRunner.runner.js></script><script src=lodeRunner.guard.js></script><script src=lodeRunner.demo.js></script><script src=lodeRunner.demoData1.js></script><script src=lodeRunner.edit.js></script><script src=lodeRunner.preload.js></script><script src=lodeRunner.colorTheme.js></script><script src=lodeRunner.colorSelector.js></script><script src=lodeRunner.gamepad.js></script><script src=lodeRunner.main.js></script><script src=lodeRunner.win.js></script><link href=/bch-slprunner/css/app.da9a570a.css rel=preload as=style><link href=/bch-slprunner/js/app.65a2215f.js rel=modulepreload as=script><link href=/bch-slprunner/js/chunk-vendors.c56b6db7.js rel=modulepreload as=script><link href=/bch-slprunner/css/app.da9a570a.css rel=stylesheet></head><body onload=init();><div class=canvas><canvas id=canvas width=960 height=400></canvas></div><div id=app></div><script type=module src=/bch-slprunner/js/chunk-vendors.c56b6db7.js></script><script type=module src=/bch-slprunner/js/app.65a2215f.js></script><script>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()},!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script><script src=/bch-slprunner/js/chunk-vendors-legacy.62d4b6b6.js nomodule></script><script src=/bch-slprunner/js/app-legacy.51b91cae.js nomodule></script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Lode Runner Web Game - SLP Version</title>
+	<!--
+	* =================================================================================== 
+	* Lode Runner (超級運動員) - APPLE II & C64 version
+	*
+	* This program is a HTML5 remake game.
+	*
+	* The program code base on CreateJS JavaScript libraries !
+	* http://www.createjs.com/
+	*
+	* The AI algorithm reference book:
+	* http://www.kingstone.com.tw/book/book_page.asp?kmcode=2014710650538
+	* http://www.amazon.co.jp/Lode-Runnerで学ぶ実践C言語-ビー・エヌ・エヌ企画部/dp/4893690116
+	* 
+	* Source Code: https://github.com/SimonHung/LodeRunner_TotalRecall
+	* Web page: http://LodeRunnerWebGame.com
+	*
+	* by Simon Hung 06/20/2014, 11/23/2014, 06/29/2015, 09/28/2016
+	* =================================================================================== 
+	-->
+	<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="chrome=1, IE=edge">
+	
+	<link href="lodeRunner.ico"  rel="shortcut icon" >
+	
+	<style>#canvas { position:absolute; left:0; top:0; }</style>
+
+	<script type="text/javascript" src="lodeRunner.wData.js"></script>
+
+	<script type="text/javascript" src="./lib/preloadjs-0.6.2.min.js"></script>
+	<script type="text/javascript" src="./lib/soundjs-0.6.2.min.js"></script>
+	<script type="text/javascript" src="./lib/tweenjs-0.6.2.min.js"></script>
+	<script type="text/javascript" src="./lib/easeljs-0.7.1.min.js"></script>
+	
+	<script type="text/javascript" src="flag32Id.js"></script>
+	<script type="text/javascript" src="lodeRunner.gameVerName.js"></script>
+
+	<script type="text/javascript" src="lodeRunner.v.classic.js"></script>
+	<script type="text/javascript" src="lodeRunner.v.professional.js"></script>
+	<script type="text/javascript" src="lodeRunner.v.revenge.js"></script>
+	<script type="text/javascript" src="lodeRunner.v.fanBookMod.js"></script>
+	<script type="text/javascript" src="lodeRunner.v.championship.js"></script>
+	
+	<script type="text/javascript" src="lodeRunner.storage.js"></script>
+	<script type="text/javascript" src="lodeRunner.def.js"></script>
+	<script type="text/javascript" src="lodeRunner.key.js"></script>
+	<script type="text/javascript" src="lodeRunner.misc.js"></script>
+	<script type="text/javascript" src="lodeRunner.hiscore.js"></script>
+	<script type="text/javascript" src="lodeRunner.info.js"></script>
+	<script type="text/javascript" src="lodeRunner.menu.js"></script>
+	<script type="text/javascript" src="lodeRunner.iconClass.js"></script>
+	<script type="text/javascript" src="lodeRunner.runner.js"></script>
+	<script type="text/javascript" src="lodeRunner.guard.js"></script>
+	<script type="text/javascript" src="lodeRunner.demo.js"></script>
+	<script type="text/javascript" src="lodeRunner.demoData1.js"></script>
+	<script type="text/javascript" src="lodeRunner.edit.js"></script>
+	<script type="text/javascript" src="lodeRunner.preload.js"></script>
+	<script type="text/javascript" src="lodeRunner.colorTheme.js"></script>
+	<script type="text/javascript" src="lodeRunner.colorSelector.js"></script>
+	<script type="text/javascript" src="lodeRunner.gamepad.js"></script>
+	<script type="text/javascript" src="lodeRunner.main.js"></script>
+	<script type="text/javascript" src="lodeRunner.win.js"></script>
+<link href="/bch-slprunner/app.js" rel="modulepreload" as="script"></head>
+<body onload="init();">	
+<div class="canvas">
+	<canvas id="canvas" width="960" height="400"></canvas>
+</div>
+<div id="app"></div>
+<script type="module" src="/bch-slprunner/app.js"></script><script>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()},!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script><script type="text/javascript" src="/bch-slprunner/app-legacy.js" nomodule></script></body>
+</html>
