@@ -1,18 +1,13 @@
 const SLPSDK = require("slp-sdk");
 const SLP = new SLPSDK({ restURL: "https://rest.bitcoin.com/v2/" });
 
-console.log("Obtaining root seed...");
 const rootSeed = SLP.Mnemonic.toSeed(
   "march mimic december feature august winner sand fault sleep phone just social"
 );
 
-console.log("Calculating master HD node...");
 const masterHDNode = SLP.HDNode.fromSeed(rootSeed);
-
-console.log("Deriving account m/44'/245'/0'...");
 const account = SLP.HDNode.derivePath(masterHDNode, "m/44'/245'/0'");
 
-console.log("Deriving address 0/0...");
 let keyNode = SLP.HDNode.derivePath(account, "0/0");
 let keyPair = SLP.HDNode.toKeyPair(keyNode);
 let keyWif = SLP.HDNode.toWIF(keyNode);
@@ -52,11 +47,10 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// this will take 75 minutes and may fail with { error: '64: too-long-mempool-chain' }
 let p = new Promise(resolve => resolve());
-for (var level = 33; level <= 150; level++) {
+for (var level = 1; level <= 150; level++) {
   p = p.then(create.bind(this, level)).then(timeout.bind(this, 30000));
 }
 
 p.catch(error => console.log(error));
-
-//createTimeout(level, 5000).then(() => {}).catch(error => console.log(error));
