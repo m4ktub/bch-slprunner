@@ -150,14 +150,16 @@ export default {
       this.txid = "";
     },
     checkGameOver() {
+      if (this.showGameOverDialog) {
+        return;
+      }
+    
       let autoPlay = 
            window.playMode == window.PLAY_AUTO
         || window.playMode == window.PLAY_DEMO
         || window.playMode == window.PLAY_DEMO_ONCE;
       
       if (window.runnerLife === 0 && window.gameState == window.GAME_WAITING && !autoPlay) {
-        window.clearInterval(this._gameOverInterval);
-        this._gameOverInterval = null;
         this.showGameOverDialog = true;
         this.gameOverLevel = window.curLevel;
       }
