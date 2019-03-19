@@ -150,7 +150,7 @@ export default {
       this.txid = "";
     },
     checkGameOver() {
-      if (this.showGameOverDialog) {
+      if (this.showStartDialog || this.showGameOverDialog) {
         return;
       }
     
