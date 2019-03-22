@@ -6,9 +6,10 @@
         <p>With the <a href="badger.bitcoin.com" target="_blank">Badger wallet</a>, just click one of the levels bellow and send the token. If you use Electron Cash SLP you can send any LVL token to the address. You will start playing from that level. <span class="alert">WARNING</span>: Any token sent will be destroyed.</p>
         <div class="levels" v-if="!showProcessingMessage">
           <p><tt>{{ slpAddress }}</tt></p>
-          <a v-for="(level, tokenId, index) in levels" :key="tokenId" 
-             v-on:click="requestToken(level, tokenId)"
-             href="#">{{ level }}</a>
+          <a v-for="(level, index) in levels" :key="'lvl' + index" 
+             v-on:click.prevent="requestToken(level)"
+             v-bind:class="{ disabled: !level.available }"
+             href="#">{{ level.level }}</a>
         </div>
         <div class="processing" v-if="showProcessingMessage">
           <p>Processing transaction...</p>
@@ -45,6 +46,16 @@ import Socket from "./socket.js";
 import wallet from "./wallet.js";
 import badger from "./badger.js";
 
+function decoratedLevels(levels) {
+  let newLevels = [];
+  
+  for (var tokenId in levels) {
+    newLevels.push({ tokenId: tokenId, available: false, level: levels[tokenId] });
+  }
+  
+  return newLevels;
+}
+
 export default {
   name: "app",
   data() {
@@ -53,17 +64,19 @@ export default {
       showStartDialog: false,
       showGameOverDialog: false,
       showProcessingMessage: false,
-      levels: wallet.levels,
+      levels: decoratedLevels(wallet.levels),
       address: wallet.bchAddress,
       slpAddress: wallet.slpAddress,
       txid: "",
       gameOverLevel: 1,
-      processed: []
+      processed: [],
+      shouldCheckUserBalance: false
     };
   },
   mounted() {
     // show start dialog
     this.showStartDialog = true;
+    this.shouldCheckUserBalance = true;
 
     // arm intervals
     this._ticker = window.setInterval(() => this.ticker++, 1000);
@@ -71,6 +84,11 @@ export default {
     this._gameOverInterval = window.setInterval(
       () => this.checkGameOver(),
       250
+    );
+    
+    this._userBalancesInterval = window.setInterval(
+      () => this.checkUserLevels(),
+      1000
     );
 
     // listen to new transactions
@@ -81,6 +99,17 @@ export default {
       }, 5000);
     });
     this._socket.onTransaction(tx => {
+      // consider user target transactions
+      let userAddress = wallet.toLegacyAddress(badger.getAddress());
+      let userOutput = tx.outputs
+        .filter(o => o.scriptPubKey.addresses)
+        .find(o => o.scriptPubKey.addresses.indexOf(userAddress) >= 0);
+
+      if (userOutput) {
+        this.shouldCheckUserBalance = true;
+      }
+
+      // consider payment transactions
       let output = tx.outputs
         .filter(o => o.scriptPubKey.addresses)
         .find(o => o.scriptPubKey.addresses.indexOf(wallet.btcAddress) >= 0);
@@ -114,7 +143,7 @@ export default {
             // load level
             window.initClassicInfo();
             window.curLevel = level;
-            window.runnerLife = Math.max(amount, 1);
+            window.runnerLife = Math.max(amount, 1) * 5;
             window.setClassicInfo(0);
             window.stopDemoAndPlay();
           }
@@ -164,13 +193,36 @@ export default {
         this.gameOverLevel = window.curLevel;
       }
     },
+    checkUserLevels() {
+      if (!this.showStartDialog || !this.shouldCheckUserBalance) {
+        return;
+      }
+      
+      let address = badger.getAddress();
+      if (!address) {
+        return;
+      }
+      
+      this.shouldCheckUserBalance = false;
+      wallet.getUserLevels(address, (error, userLevelTokens) => {
+        if (error) {
+          this.shouldCheckUserBalance = true;
+          console.log(error);
+        } else {
+          for (var i = 0; i < this.levels.length; i++) {
+            let level = this.levels[i];
+            level.available = userLevelTokens.includes(level.tokenId);
+          }
+        }
+      });
+    },
     requestPayment() {
       badger.requestSend(wallet.bchAddress, (err, txid) => {
         console.log("badger sent txid: " + txid, err);
       });
     },
-    requestToken(level, tokenId) {
-       badger.requestTokenSend(wallet.bchAddress, tokenId, (err, txid) => {
+    requestToken(level) {
+      badger.requestTokenSend(wallet.bchAddress, level.tokenId, (err, txid) => {
         console.log("badger sent txid: " + txid, err);
       });
     }
@@ -267,6 +319,12 @@ export default {
 .popup div.levels a:hover {
   background-color: #faa;
   color: white;
+}
+
+.popup div.levels a.disabled {
+  border: 1px solid #888888;
+  color: #888888;
+  background-color: #cccccc;
 }
 
 .popup div.buttons {

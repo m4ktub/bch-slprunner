@@ -192,15 +192,17 @@ async function getTxDetailsWithRetry(txid, times, interval) {
 }
 
 async function getAddressBalancesWithRetry(slpAddress, times, interval) {
-  let attempts = times;
+  let attempts = times || 1;
   do {
     attempts--;
 
     let balances = await SLP.Utils.balancesForAddress(slpAddress);
     if (balances.length) {
       return balances;
-    } else if (attempts > 0) {
-      await timeout(interval);
+    } else if (attempts <= 0) {
+      return [];
+    } else {
+      await timeout(interval || 1000);
     }
   } while (attempts > 0);
 }
@@ -335,6 +337,27 @@ async function sendBackToken(txid, level, callback) {
   }
 }
 
+async function getUserLevels(userAddress, callback) {
+  try {
+    let userSlpAddress = SLP.Address.toSLPAddress(userAddress);
+    let balances = await getAddressBalancesWithRetry(userSlpAddress);
+    let lvlBalances = balances
+      .filter(balance => {
+        let lvl = levels[balance.tokenId];
+        return lvl && parseInt(balance.balance) > 0;
+      })
+      .map(balance => balance.tokenId);
+
+    callback(null, lvlBalances);
+  } catch (error) {
+    callback(error, null);
+  }
+}
+
+function toLegacyAddress(address) {
+  return SLP.Address.toLegacyAddress(address);
+}
+
 export default {
   SLP,
   bchAddress,
@@ -342,5 +365,7 @@ export default {
   btcAddress,
   levels,
   burn,
-  sendBackToken
+  sendBackToken,
+  getUserLevels,
+  toLegacyAddress
 };

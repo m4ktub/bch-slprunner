@@ -39,9 +39,15 @@ function requestTokenSend(address, tokenId, callback) {
   badger.bch.sendTransaction(options, callback);
 }
 
+function getAddress() {
+  if (!isUnlocked()) return "";
+  return badger.bch.defaultAccount;
+}
+
 export default {
   hasBadger,
   isUnlocked,
+  getAddress,
   requestSend,
   requestTokenSend
 };
