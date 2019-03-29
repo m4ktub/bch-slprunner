@@ -197,7 +197,7 @@ async function getAddressBalancesWithRetry(slpAddress, times, interval) {
     attempts--;
 
     let balances = await SLP.Utils.balancesForAddress(slpAddress);
-    if (balances.length) {
+    if (Array.isArray(balances) && balances.length) {
       return balances;
     } else if (attempts <= 0) {
       return [];
@@ -216,9 +216,10 @@ async function burn(txid, vout, satoshis, callback) {
 
   // balance check
   // [{"tokenId":"0d02b95fa0765db9eed2ed958bec4aa51391106783de3f795a0efddace2b2c50","balance":"1","decimalCount":0}]
-  let balances = await getAddressBalancesWithRetry(slpAddress, 30, 1000);
+  let balances = await getAddressBalancesWithRetry(slpAddress, 60, 2000);
   if (!balances.length) {
     console.log(`transaction ${txid} deposited no tokens`);
+    callback(1, 1); // error out by going to the first level
     return;
   }
 
@@ -267,7 +268,7 @@ async function burn(txid, vout, satoshis, callback) {
 async function sendBackToken(txid, level, callback) {
   try {
     // get transaction details and matching output
-    let userTx = await getTxDetailsWithRetry(txid, 30, 1000);
+    let userTx = await getTxDetailsWithRetry(txid, 30, 2000);
     let userOut = userTx.vout
       .filter(o => o.scriptPubKey.addresses)
       .find(o => o.scriptPubKey.addresses.indexOf(btcAddress) >= 0);

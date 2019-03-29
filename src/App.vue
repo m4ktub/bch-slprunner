@@ -3,7 +3,7 @@
     <div id="startdialog" v-bind:class="startDialogClass">
       <div class="dialog">
         <h2>Play LodeRunner with SLP Tokens</h2>
-        <p>With the <a href="badger.bitcoin.com" target="_blank">Badger wallet</a>, just click one of the levels bellow and send the token. If you use Electron Cash SLP you can send any LVL token to the address. You will start playing from that level. <span class="alert">WARNING</span>: Any token sent will be destroyed.</p>
+        <p>With the <a href="https://badger.bitcoin.com" target="_blank">Badger wallet</a>, just click one of the levels bellow and send the token. If you use Electron Cash SLP you can send any LVL token to the address. You will start playing from that level. <span class="alert">WARNING</span>: Any token sent will be destroyed.</p>
         <div class="levels" v-if="!showProcessingMessage">
           <p><tt>{{ slpAddress }}</tt></p>
           <a v-for="(level, index) in levels" :key="'lvl' + index" 
@@ -25,7 +25,7 @@
         <h2>DED!</h2>
         <p>It happens but don't worry. This way you can get a nice LVL token that allows you to start from level {{ gameOverLevel }} directly.</p>
         <p>Pay 1 cent with badger and receive back a resume token. You can also show that token as a badge of merit for reaching this far.</p>
-        <p><span class="alert">WARNING</span>: Use the <a href="badger.bitcoin.com" target="_blank">Badger wallet</a> and don't send more than 1 cent.</p>
+        <p><span class="alert">WARNING</span>: Use the <a href="https://badger.bitcoin.com" target="_blank">Badger wallet</a> and don't send more than 1 cent.</p>
         <div class="buttons badger" v-if="!showProcessingMessage">
            <button v-on:click="requestPayment" v-bind:disabled="!canBadger" v-bind:title="payButtonTitle">Pay 1 cent</button>
         </div>
@@ -69,14 +69,15 @@ export default {
       slpAddress: wallet.slpAddress,
       txid: "",
       gameOverLevel: 1,
-      processed: [],
-      shouldCheckUserBalance: false
+      processed: []
     };
   },
   mounted() {
+    // disable highscores
+    this.showScoreTable = function() {};
+  
     // show start dialog
     this.showStartDialog = true;
-    this.shouldCheckUserBalance = true;
 
     // arm intervals
     this._ticker = window.setInterval(() => this.ticker++, 1000);
@@ -86,9 +87,10 @@ export default {
       250
     );
     
+    this.checkUserLevels();
     this._userBalancesInterval = window.setInterval(
       () => this.checkUserLevels(),
-      1000
+      30000
     );
 
     // listen to new transactions
@@ -99,16 +101,6 @@ export default {
       }, 5000);
     });
     this._socket.onTransaction(tx => {
-      // consider user target transactions
-      let userAddress = wallet.toLegacyAddress(badger.getAddress());
-      let userOutput = tx.outputs
-        .filter(o => o.scriptPubKey.addresses)
-        .find(o => o.scriptPubKey.addresses.indexOf(userAddress) >= 0);
-
-      if (userOutput) {
-        this.shouldCheckUserBalance = true;
-      }
-
       // consider payment transactions
       let output = tx.outputs
         .filter(o => o.scriptPubKey.addresses)
@@ -162,6 +154,9 @@ export default {
             this.showGameOverDialog = false;
             
             // back to start
+            window.setTimeout(() => this.checkUserLevels(), 2000);
+            window.setTimeout(() => this.checkUserLevels(), 5000);
+            window.setTimeout(() => this.checkUserLevels(), 10000);
             this.restartGame();
           }
         });
@@ -194,19 +189,17 @@ export default {
       }
     },
     checkUserLevels() {
-      if (!this.showStartDialog || !this.shouldCheckUserBalance) {
+      if (!this.showStartDialog || this.showProcessingMessage) {
         return;
       }
-      
+    
       let address = badger.getAddress();
       if (!address) {
         return;
       }
       
-      this.shouldCheckUserBalance = false;
       wallet.getUserLevels(address, (error, userLevelTokens) => {
         if (error) {
-          this.shouldCheckUserBalance = true;
           console.log(error);
         } else {
           for (var i = 0; i < this.levels.length; i++) {
