@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: "/bch-slprunner",
+  publicPath: "/",
   configureWebpack: {
     output: {
         globalObject: "(typeof self !== 'undefined' ? self : this)"
